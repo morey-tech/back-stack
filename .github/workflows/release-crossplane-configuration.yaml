@@ -1,5 +1,5 @@
 
-name: Configurations
+name: Release Crossplane Configuration
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
   CROSSPLANE_VERSION: v1.14.4
 
 jobs:
-  release-configuration:
+  release:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
       
       - name: Set tag
-        run: echo "VERSION_TAG=$(git rev-parse --short=12 HEAD)" >> $GITHUB_OUTPUT
+        run: echo "VERSION_TAG=$(git rev-parse --short=8 HEAD)" >> $GITHUB_OUTPUT
         id: tag
       
       - name: Log in to the Container registry
@@ -47,4 +47,5 @@ jobs:
       
       - name: Push
         run: |
-          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.VERSION_TAG }}
+          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:${{ steps.tag.outputs.VERSION_TAG }}
+          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:latest
