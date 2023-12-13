@@ -60,7 +60,7 @@ kubectl apply -f - <<-EOF
     metadata:
       name: back-stack
     spec:
-      package: ghcr.io/opendev-ie/back-stack-configuration:v1.0.3
+      package: ghcr.io/back-stack/showcase-configuration:v1.0.3
 EOF
 
 
