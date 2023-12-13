@@ -42,12 +42,12 @@ jobs:
         uses: crossplane-contrib/xpkg-action@3f0393aecd478da1072bcb6a1ecb139ff5f9f896 # v0.2.0
         with:
           channel: stable
-          version: v1.14.4
+          version: 1.14.4
           command: xpkg build --package-root=crossplane/ -o crossplane/showcase-configuration.xkpg
       
       - name: Push
         uses: crossplane-contrib/xpkg-action@3f0393aecd478da1072bcb6a1ecb139ff5f9f896 # v0.2.0
         with:
           channel: stable
-          version: v1.14.4
+          version: 1.14.4
           command: xpkg push -f crossplane/showcase-configuration.xkpg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tagger.outputs.VERSION_TAG }}
