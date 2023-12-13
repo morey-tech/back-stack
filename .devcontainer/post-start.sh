@@ -6,6 +6,7 @@ echo "post-start start" >> ~/status
 
 # kind delete cluster --name akuity-declarative-example
 kind create cluster --config .devcontainer/kind-cluster.yaml
+kind export kubeconfig
 
 # configure ingress
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/kind/deploy.yaml
