@@ -43,8 +43,8 @@ jobs:
       
       - name: Build
         run: |
-          crossplane xpkg build --package-root=crossplane/ -o crossplane/${{ env.IMAGE_NAME }}.xpkg
+          crossplane xpkg build --package-root=crossplane/ -o crossplane/back-stack.xpkg
       
       - name: Push
         run: |
-          crossplane xpkg push -f crossplane/${{ env.IMAGE_NAME }}.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.VERSION_TAG }}
+          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.VERSION_TAG }}
