@@ -25,3 +25,8 @@ RUN curl -Lo /tmp/helm.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd
     && tar -xvf /tmp/helm.tar.gz -C /tmp \
     && mv /tmp/linux-amd64/helm /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm
+
+# https://releases.crossplane.io/stable/
+ENV CROSSPLANE_VERSION=v1.14.4
+RUN curl -Lo /usr/local/bin/crossplane "https://releases.crossplane.io/stable/${CROSSPLANE_VERSION}/bin/linux_amd64/crank" \
+    && chmod +x /usr/local/bin/crossplane
