@@ -1,0 +1,53 @@
+
+name: Configurations
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release-configuration:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+      
+      # The tagger step uses the same logic in the build submodule to generate package tag
+      # https://github.com/upbound/build/blob/4f64913157a952dbe77cd9e05457d9abe695a1d4/makelib/common.mk#L193
+      - name: Set tag
+        # run: echo "VERSION_TAG=$(git describe --dirty --always --tags | sed 's/-/./2' | sed 's/-/./2' )" >> $GITHUB_OUTPUT
+        run: echo "VERSION_TAG=$(git rev-parse --short=12 HEAD)" >> $GITHUB_OUTPUT
+        id: tagger
+      
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build
+        uses: crossplane-contrib/xpkg-action@3f0393aecd478da1072bcb6a1ecb139ff5f9f896 # v0.2.0
+        with:
+          channel: stable
+          version: v1.14.4
+          command: xpkg build --package-root=crossplane/ -o crossplane/showcase-configuration.xkpg
+      
+      - name: Push
+        uses: crossplane-contrib/xpkg-action@3f0393aecd478da1072bcb6a1ecb139ff5f9f896 # v0.2.0
+        with:
+          channel: stable
+          version: v1.14.4
+          command: xpkg push -f crossplane/showcase-configuration.xkpg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tagger.outputs.VERSION_TAG }}
