@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: crossplane
+
+namespace: crossplane-system
+
+resources:
+- aws-providerconfig.yaml
+- azure-providerconfig.yaml
+- back-stack-configuration.yaml
+- helm-controlerconfig.yaml
+- helm-crb.yaml
+- helm-providerconfig.yaml
+- kubernetes-controlerconfig.yaml
+- kubernetes-crb.yaml
+- kubernetes-providerconfig.yaml
+
+helmCharts:
+- name: crossplane
+  includeCRDs: true
+  namespace: crossplane-system
+  releaseName: crossplane
+  version: v1.14.4
+  repo: https://charts.crossplane.io/stable
+  valuesInline:
+    args:
+      - --enable-external-secret-stores
+
+- name: ess-plugin-vault
+  includeCRDs: true
+  namespace: crossplane-system
+  releaseName: crossplane
+  version: 0.2.0
+  # OCI requires helm => 3.8.0 and kustomize => v5.2.1
+  repo: oci://xpkg.upbound.io/crossplane-contrib
+  valuesInline:
+    podAnnotations:
+      vault.hashicorp.com/agent-inject: "true"
+      vault.hashicorp.com/agent-inject-token: "true"
+      vault.hashicorp.com/role: "crossplane"
+      vault.hashicorp.com/agent-run-as-user: "65532"

@@ -41,4 +41,11 @@ RUN apt-get update \
     && apt-get install -y nodejs \
     && npm install --global yarn
 
+# https://github.com/kubernetes-sigs/kustomize/releases
+ENV KUSTOMIZE_VERSION=v5.3.0
+RUN curl -Lo /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz \
+    && tar -xvf /tmp/kustomize.tar.gz -C /tmp \
+    && mv /tmp/kustomize /usr/local/bin/kustomize \
+    && chmod +x /usr/local/bin/kustomize
+
 RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
