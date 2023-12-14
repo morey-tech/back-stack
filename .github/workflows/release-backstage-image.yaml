@@ -34,16 +34,19 @@ jobs:
       - name: Run yarn install
         uses: borales/actions-yarn@v4
         with:
+          dir: backstage
           cmd: install
 
       - name: Build backend bundle
         uses: borales/actions-yarn@v4
         with:
+          dir: backstage
           cmd: build:backend
       
       - name: Build the image
         uses: borales/actions-yarn@v4
         with:
+          dir: backstage
           cmd: |
             build-image \
             --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:${{ steps.tag.outputs.VERSION_TAG }}
