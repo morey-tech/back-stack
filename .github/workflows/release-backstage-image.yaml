@@ -54,4 +54,4 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           dir: backstage
-          cmd: build-image --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:${{ steps.tag.outputs.VERSION_TAG }} --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:latest --output=type=registry
+          cmd: build-image --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:${{ steps.tag.outputs.VERSION_TAG }} --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:latest
