@@ -45,12 +45,12 @@ jobs:
       
       - name: Build
         run: |
-          crossplane xpkg build --package-root=crossplane/ -o crossplane/back-stack.xpkg
+          crossplane xpkg build --package-root=crossplane/configuration/ -o crossplane/configuration/back-stack.xpkg
       
       - name: Push
         run: |
-          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:${{ steps.tag.outputs.VERSION_TAG }}
-          crossplane xpkg push -f crossplane/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:latest
+          crossplane xpkg push -f crossplane/configuration/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:${{ steps.tag.outputs.VERSION_TAG }}
+          crossplane xpkg push -f crossplane/configuration/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:latest
 
   backstage:
     runs-on: ubuntu-latest

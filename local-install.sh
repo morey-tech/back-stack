@@ -43,15 +43,25 @@ EOF
 
 # configure ingress
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/kind/deploy.yaml
-kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s 
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s 
 
 # install crossplane
-helm upgrade --install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane --set args='{--enable-external-secret-stores}' --wait
+helm repo add crossplane-stable https://charts.crossplane.io/stable
+helm upgrade --install crossplane \
+  --namespace crossplane-system \
+  --create-namespace \
+  crossplane-stable/crossplane \
+  --set args='{--enable-external-secret-stores}' \
+  --wait
 
 # install vault ess plugin
-helm upgrade --install ess-plugin-vault oci://xpkg.upbound.io/crossplane-contrib/ess-plugin-vault --namespace crossplane-system --set-json podAnnotations='{"vault.hashicorp.com/agent-inject": "true", "vault.hashicorp.com/agent-inject-token": "true", "vault.hashicorp.com/role": "crossplane", "vault.hashicorp.com/agent-run-as-user": "65532"}'
-
-waitfor default crd configurations.pkg.crossplane.io
+helm upgrade --install ess-plugin-vault \
+  oci://xpkg.upbound.io/crossplane-contrib/ess-plugin-vault \
+  --namespace crossplane-system \
+  --set-json podAnnotations='{"vault.hashicorp.com/agent-inject": "true", "vault.hashicorp.com/agent-inject-token": "true", "vault.hashicorp.com/role": "crossplane", "vault.hashicorp.com/agent-run-as-user": "65532"}'
 
 # install back stack
 kubectl apply -f - <<-EOF
@@ -60,7 +70,8 @@ kubectl apply -f - <<-EOF
     metadata:
       name: back-stack
     spec:
-      package: ghcr.io/back-stack/showcase-configuration:v1.0.3
+      package: ghcr.io/morey-tech/back-stack-configuration:latest
+      packagePullPolicy: Always
 EOF
 
 
@@ -83,7 +94,7 @@ EOF
 waitfor default crd providerconfigs.kubernetes.crossplane.io
 kubectl wait crd/providerconfigs.kubernetes.crossplane.io --for=condition=Established --timeout=1m
 SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+kubectl create clusterrolfebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
 kubectl create -f - <<- EOF
     apiVersion: kubernetes.crossplane.io/v1alpha1
     kind: ProviderConfig
