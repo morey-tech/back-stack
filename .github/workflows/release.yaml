@@ -1,4 +1,4 @@
-name: Release Crossplane Configuration
+name: Release
 
 on:
   push:
