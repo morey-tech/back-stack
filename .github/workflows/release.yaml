@@ -1,5 +1,4 @@
-
-name: Release Crossplane Configuration
+name: Release
 
 on:
   push:
@@ -9,6 +8,11 @@ on:
     branches:
       - main
   workflow_dispatch: {}
+
+concurrency:
+  # Branch or tag that triggered the workflow.
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
