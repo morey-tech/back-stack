@@ -64,16 +64,7 @@ helm upgrade --install ess-plugin-vault \
   --set-json podAnnotations='{"vault.hashicorp.com/agent-inject": "true", "vault.hashicorp.com/agent-inject-token": "true", "vault.hashicorp.com/role": "crossplane", "vault.hashicorp.com/agent-run-as-user": "65532"}'
 
 # install back stack
-kubectl apply -f - <<-EOF
-    apiVersion: pkg.crossplane.io/v1
-    kind: Configuration
-    metadata:
-      name: back-stack
-    spec:
-      package: ghcr.io/morey-tech/back-stack-configuration:latest
-      packagePullPolicy: Always
-EOF
-
+kubectl apply -f crossplane/manifests/configuration.yaml
 
 # configure provider-helm for crossplane
 waitfor default crd providerconfigs.helm.crossplane.io
@@ -94,7 +85,7 @@ EOF
 waitfor default crd providerconfigs.kubernetes.crossplane.io
 kubectl wait crd/providerconfigs.kubernetes.crossplane.io --for=condition=Established --timeout=1m
 SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolfebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
+kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
 kubectl create -f - <<- EOF
     apiVersion: kubernetes.crossplane.io/v1alpha1
     kind: ProviderConfig
