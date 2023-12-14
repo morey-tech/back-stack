@@ -1,0 +1,10 @@
+# Warning: ControllerConfig.pkg.crossplane.io/v1alpha1 is deprecated.
+# Use DeploymentRuntimeConfig from pkg.crossplane.io/v1beta1 instead.
+# Can't switch due to using a Configuration to deploy providers, and
+# that doesn't support referencing a DeploymentRuntimeConfig.
+apiVersion: pkg.crossplane.io/v1alpha1
+kind: ControllerConfig
+metadata:
+  name: crossplane-contrib-provider-kubernetes
+spec:
+  serviceAccountName: crossplane-contrib-provider-kubernetes

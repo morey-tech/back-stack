@@ -2,45 +2,6 @@
 # import helpers
 . scripts/common.sh
 
-# Check for required tools
-for tool in "helm" "kind" "kubectl"
-do
-  if ! command_exists "$tool"; then
-    echo "This script relies on $tool. Install with 'brew install $tool' (assuming you're on Mac)";
-    exit 1;
-  fi
-done
-
-# Version check for `helm`
-HELM_VERSION=$(helm version --template='{{.Version}}')
-HELM_MAJOR_VERSION=$(echo ${HELM_VERSION:1} | cut -d'.' -f1)
-HELM_MINOR_VERSION=$(echo $HELM_VERSION | cut -d'.' -f2)
-if ! ( [[ "$HELM_MAJOR_VERSION" -gt 3 ]] || ( [[ "$HELM_MAJOR_VERSION" -eq 3 ]] && [[ "$HELM_MINOR_VERSION" -gt 9 ]] ) ); then
-  echo "Unsupported version of helm - update to at least 3.10.0 for support for '--set-json'"
-  exit 1
-fi
-
-# set up kind cluster
-kind create cluster --name backstack --wait 5m --config=- <<- EOF
-  kind: Cluster
-  apiVersion: kind.x-k8s.io/v1alpha4
-  nodes:
-  - role: control-plane
-    kubeadmConfigPatches:
-    - |
-      kind: InitConfiguration
-      nodeRegistration:
-        kubeletExtraArgs:
-          node-labels: "ingress-ready=true"        
-    extraPortMappings:
-    - containerPort: 80
-      hostPort: 80
-      protocol: TCP
-    - containerPort: 443
-      hostPort: 443
-      protocol: TCP
-EOF
-
 # configure ingress
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/kind/deploy.yaml
 kubectl wait --namespace ingress-nginx \
@@ -64,71 +25,31 @@ helm upgrade --install ess-plugin-vault \
   --set-json podAnnotations='{"vault.hashicorp.com/agent-inject": "true", "vault.hashicorp.com/agent-inject-token": "true", "vault.hashicorp.com/role": "crossplane", "vault.hashicorp.com/agent-run-as-user": "65532"}'
 
 # install back stack
-kubectl apply -f crossplane/manifests/configuration.yaml
+kubectl apply -f crossplane/manifests/back-stack-configuration.yaml
 
 # configure provider-helm for crossplane
 waitfor default crd providerconfigs.helm.crossplane.io
 kubectl wait crd/providerconfigs.helm.crossplane.io --for=condition=Established --timeout=1m
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-helm | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-helm-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
-kubectl create -f - <<- EOF
-    apiVersion: helm.crossplane.io/v1beta1
-    kind: ProviderConfig
-    metadata:
-      name: local
-    spec:
-      credentials:
-        source: InjectedIdentity
-EOF
+kubectl apply -f crossplane/manifests/helm-controlerconfig.yaml
+kubectl apply -f crossplane/manifests/helm-providerconfig.yaml
+kubectl apply -f crossplane/manifests/helm-crb.yaml
 
 # configure provider-kubernetes for crossplane
 waitfor default crd providerconfigs.kubernetes.crossplane.io
 kubectl wait crd/providerconfigs.kubernetes.crossplane.io --for=condition=Established --timeout=1m
-SA=$(kubectl -n crossplane-system get sa -o name | grep provider-kubernetes | sed -e 's|serviceaccount\/|crossplane-system:|g')
-kubectl create clusterrolebinding provider-kubernetes-admin-binding --clusterrole cluster-admin --serviceaccount="${SA}"
-kubectl create -f - <<- EOF
-    apiVersion: kubernetes.crossplane.io/v1alpha1
-    kind: ProviderConfig
-    metadata:
-      name: local
-    spec:
-      credentials:
-        source: InjectedIdentity
-EOF
+kubectl apply -f crossplane/manifests/kubernetes-controlerconfig.yaml
+kubectl apply -f crossplane/manifests/kubernetes-providerconfig.yaml
+kubectl apply -f crossplane/manifests/kubernetes-crb.yaml
 
 # configure provider-azure for crossplane
 waitfor default crd providerconfigs.azure.upbound.io
 kubectl wait crd/providerconfigs.azure.upbound.io --for=condition=Established --timeout=1m
-kubectl create -f - <<- EOF
-    apiVersion: azure.upbound.io/v1beta1
-    kind: ProviderConfig
-    metadata:
-      name: default
-    spec:
-      credentials:
-        source: Secret
-        secretRef:
-          namespace: crossplane-system
-          name: azure-secret
-          key: credentials    
-EOF
+kubectl apply -f crossplane/manifests/azure-providerconfig.yaml
 
 # configure provider-aws for crossplane
 waitfor default crd providerconfigs.aws.upbound.io
 kubectl wait crd/providerconfigs.aws.upbound.io --for=condition=Established --timeout=1m
-kubectl create -f - <<- EOF
-    apiVersion: aws.upbound.io/v1beta1
-    kind: ProviderConfig
-    metadata:
-      name: default
-    spec:
-      credentials:
-        source: Secret
-        secretRef:
-          namespace: crossplane-system
-          name: aws-secret
-          key: credentials
-EOF
+kubectl apply -f crossplane/manifests/aws-providerconfig.yaml
 
 # get config
 loadenv ./.env
