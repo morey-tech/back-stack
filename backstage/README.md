@@ -8,3 +8,10 @@ To start the app, run:
 yarn install
 yarn dev
 ```
+
+## Build Image
+```
+yarn install
+yarn build:backend
+yarn build-image --tag ghcr.io/morey-tech/back-stack-backstage
+```
