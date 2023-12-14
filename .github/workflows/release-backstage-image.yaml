@@ -1,0 +1,51 @@
+name: Release Backstage Image
+on: 
+  push:
+    branches:
+    - main
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set tag
+        run: echo "VERSION_TAG=$(git rev-parse --short=8 HEAD)" >> $GITHUB_OUTPUT
+        id: tag
+
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Run yarn install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+
+      - name: Build backend bundle
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build:backend
+      
+      - name: Build the image
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: |
+            build-image \
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:${{ steps.tag.outputs.VERSION_TAG }}
+            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:latest
+            --output=type=registry
