@@ -97,6 +97,12 @@ jobs:
           dir: backstage
           cmd: install
 
+      - name: Run yarn tsc
+        uses: borales/actions-yarn@v4
+        with:
+          dir: backstage
+          cmd: tsc
+
       - name: Build backend bundle
         uses: borales/actions-yarn@v4
         with:
