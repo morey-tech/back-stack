@@ -8,6 +8,7 @@ namespace: crossplane-system
 resources:
 - aws-providerconfig.yaml
 - azure-providerconfig.yaml
+- back-stack-configuration.yaml
 - helm-controlerconfig.yaml
 - helm-crb.yaml
 - helm-providerconfig.yaml
