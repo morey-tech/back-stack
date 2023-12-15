@@ -6,7 +6,5 @@ apiVersion: pkg.crossplane.io/v1alpha1
 kind: ControllerConfig
 metadata:
   name: crossplane-contrib-provider-kubernetes
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
 spec:
   serviceAccountName: crossplane-contrib-provider-kubernetes

@@ -3,8 +3,6 @@ kind: ClusterRoleBinding
 metadata:
   creationTimestamp: null
   name: provider-helm-admin-binding
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
