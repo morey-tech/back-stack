@@ -59,7 +59,7 @@ jobs:
           crossplane xpkg push -f crossplane/configuration/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:${{ steps.tag.outputs.VERSION_TAG }}
 
       - name: Push latest Tag (if on main)
-        if: ${{ ! github.event_name == 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           crossplane xpkg push -f crossplane/configuration/back-stack.xpkg ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-configuration:latest
 
@@ -114,6 +114,6 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:${{ steps.tag.outputs.VERSION_TAG }}
 
       - name: Push latest Tag (if on main)
-        if: ${{ ! github.event_name == 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backstage:latest
