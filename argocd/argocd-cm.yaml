@@ -4,4 +4,11 @@ metadata:
   name: argocd-cm
 data:
   kustomize.buildOptions: --enable-helm
+  # https://docs.crossplane.io/knowledge-base/integrations/argo-cd-crossplane/#set-resource-tracking-method
   application.resourceTrackingMethod: annotation+label
+  # https://docs.crossplane.io/knowledge-base/integrations/argo-cd-crossplane/#set-resource-exclusion
+  resource.exclusions: |
+    - apiGroups:
+      - "*"
+      kinds:
+      - ProviderConfigUsage
