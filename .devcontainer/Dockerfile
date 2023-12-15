@@ -48,4 +48,8 @@ RUN curl -Lo /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/
     && mv /tmp/kustomize /usr/local/bin/kustomize \
     && chmod +x /usr/local/bin/kustomize
 
+ENV YQ_VERSION=v4.40.5
+RUN wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64.tar.gz -O - | tar xz \
+        && mv yq_linux_amd64 /usr/bin/yq
+
 RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
