@@ -40,3 +40,5 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y nodejs \
     && npm install --global yarn
+
+RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
