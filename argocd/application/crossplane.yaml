@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: crossplane
+  namespace: crossplane-system
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/morey-tech/back-stack
+    path: crossplane/manifests
+    targetRevision: HEAD
+  destination: 
+    name: in-cluster
+    namespace: default
+  syncPolicy:
+    syncOptions:
+    - Replace=true
+    - ServerSideApply=true
+    automated: {}
