@@ -6,7 +6,7 @@ metadata:
 namespace: crossplane-system
 
 # resources:
-# - back-stack-configuration.yaml
+# - 
 
 helmCharts:
 - name: crossplane
