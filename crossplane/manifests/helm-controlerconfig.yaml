@@ -2,6 +2,8 @@ apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
 metadata:
   name: crossplane-contrib-provider-helm-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   serviceAccountTemplate:
     metadata:
