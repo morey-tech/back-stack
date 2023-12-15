@@ -17,3 +17,8 @@ spec:
     - CreateNamespace=true
     - ServerSideApply=true
     automated: {}
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jqPathExpressions:
+    - .spec.template.spec.containers[].env[].valueFrom.resourceFieldRef.divisor
