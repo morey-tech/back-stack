@@ -5,7 +5,6 @@ echo "post-start start" >> ~/status
 # this runs in background each time the container starts
 
 # kind delete cluster --name back-stack
-kind create cluster --config .devcontainer/kind-cluster.yaml
 kind export kubeconfig --name back-stack
 
 # configure ingress
